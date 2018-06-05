@@ -1,0 +1,99 @@
+---
+title: "Multiple Linear Regrssion"
+
+output:
+  html_document: default
+  html_notebook: default
+---
+
+***Before building model we will check:***
+
+- ***Descriptive statistic of the dataset***
+ 
+- ***Find correlation***
+ 
+- ***Check association between variables with the help of scatter plot.***
+ 
+- ***Build Multiple Linear Regression model.***
+ 
+- ***Perform Residual Analysis on the best model (Plot and Normality Test- Shapiro's-Wilk)***
+
+
+#### Loading R-packages
+```{r}
+library(corrplot)
+```
+
+#### Import dataset
+```{r}
+mydata = read.table("C:/Users/Supriya Khadake/Desktop/Spring_2017/527/HW/HW4/HW4_DATA.txt", header = T)
+
+# Assigning variablels
+sales = mydata$sales
+title = mydata$title
+footage = mydata$footage
+pc = mydata$pc
+apple = mydata$apple
+
+#Check first few rows of the dataset
+head(mydata)
+
+# Descriptive statistic 
+summary(mydata)
+```
+
+#### Scatter Plot to check association between variables
+From the below plots we can see that there is a linear association between variables
+```{r}
+plot(mydata)
+```
+
+#### Lets check correlation between variables
+From the below plot we can see that title and pc, and title ana apple have strong correlation
+```{r}
+correlation = cor(cbind(sales, title, footage, pc, apple))
+corrplot(correlation, method = "number")
+```
+
+#### Lets proceed and build regression model
+```{r}
+model1 = lm(sales ~ title + footage +  pc + apple)
+summary(model1)
+```
+
+By individual parameter test we can say that none variable is significant to the variable sales
+Hence we eliminate one by one and rebuild th model
+
+#### Rebuilding model by eliminating apple
+```{r}
+model2 = lm(sales ~ title + footage +  pc)
+summary(model2)
+```
+
+#### Rebuilding model by eiminating pc
+```{r}
+model3 = lm(sales ~ title + footage)
+summary(model3)
+```
+
+#### Rebuilding model by eiminating footage
+```{r}
+model4 = lm(sales ~ title)
+summary(model4)
+```
+
+
+#### Residual Analysis
+1. We can see Constant Variance
+2. It shows Linearity distribution as points are scattered around zero line
+3. Normality Test: p-value > 0.05 hence we accept NULL hypothesis
+4. Influential Points: Potential outliers are observed with residual/studentized residuals larger than 3 and smaller than -3. We observe that one potential outlier in this case
+
+```{r}
+plot(fitted(model1), rstandard(model1), main = "Predicted vs Residuals")
+abline(a = 0, b = 0, col = "red")
+
+r = rstandard(model1)
+shapiro.test(r)
+```
+
